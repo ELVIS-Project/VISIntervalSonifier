@@ -1,0 +1,4 @@
+Date: August 6, 2013
+
+Sonify the ranges of Dufay, Palestrina, and Josquin
+(We would like to display how the composers increase in range over time)
