@@ -20,9 +20,9 @@ s.boot;
 var loadB, clearB, clearAllB, playB, recB, //dataB, mapB,//buttons
 knb1, knb2, knb3, //knobs
 dataM, mapM, //pop-up menus
-titleS, loadV, dataV, //views
+loadV, dataV, //views
 horzChk, vertChk, diaChk, stackChk, stereoChk,//checkboxes
-dataStr, mapStr, //statictext
+subTitleS, titleS, dataStr, mapStr, //statictext
 knb1Str, knb2Str, knb3Str, vertMaxStr, vertMinStr, horzMaxStr, horzMinStr, //statictext
 horpos, vertpos, playindx, xMinStr, xMidStr, xMaxStr, horzStr, vertStr,//statictext
 dataFont, //formating
@@ -52,14 +52,14 @@ var rising, descending, diatonic, octave;
 QtGUI.palette =QPalette.dark;
 
 // Basic GUI Set-up: Window,
-w = Window.new("VIS Interval Sonifier",
+w = Window.new("elvisproject.ca",
 	Rect(Window.availableBounds.width/2-300,
 		Window.availableBounds.height/2-250,600,500)).front;
 // ...then layout.
 w.layout_(GridLayout.rows(
-//	[[titleS=StaticText(), rows:1, columns:6],nil,nil,nil,nil,nil],
-	[nil,nil,nil,[titleS=StaticText(), rows:2, columns:3]],
-	[[loadB=Button()],[clearB=Button()],[clearAllB=Button()],nil,nil,nil],
+	[[titleS=StaticText(), rows:2, columns:6],nil,nil,nil,nil,nil],
+	[nil,nil,nil,nil,nil,nil],
+	[[loadB=Button()],[clearB=Button()],[clearAllB=Button()],[subTitleS=StaticText(), rows:1, columns:3]],
 	[[loadV=ListView(),columns:3,rows:3], nil, nil,
 		[mapM=PopUpMenu()], [dataM=PopUpMenu()], [recB=Button()]],
 //	[nil,nil,nil, [mapM=PopUpMenu()], [dataM=PopUpMenu()], [recB=Button()]],
@@ -77,7 +77,7 @@ w.layout_(GridLayout.rows(
 ));
 
 // Must put stuff on top of other stuff..
-w.layout.add(vertMaxStr=StaticText(),6,0);
+w.layout.add(vertMaxStr=StaticText(),7,0);
 
 // .. and change the bottom margin to zero for petitieosity.
 w.layout.margins = [10, 10, 10, 0];
@@ -97,13 +97,15 @@ w.layout.setAlignment(vertChk,\left);
 w.layout.setAlignment(horzChk,\left);
 w.layout.setAlignment(vertStr,\top);
 w.layout.setAlignment(horzStr,\top);
+subTitleS.align=\center;
 titleS.align=\center;
 knb1Str.align = \center;
 knb2Str.align = \center;
 knb3Str.align = \center;
 
 // Format Title
-titleS.string_("VIS Interval Sonifier"); titleS.font =  Font("Modern No. 20", 22);
+titleS.string_("ELVIS Interval Sonifier"); titleS.font =  Font("Book Antiqua", 28);
+subTitleS.string_("Sound & Data Controls"); subTitleS.font =  Font("Helvetica", 16);
 
 // Set strings
 knb1Str.string_("Spread");
