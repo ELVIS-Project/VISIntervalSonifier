@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/mikewinters/Desktop/ELVISon/server/plugins/onsetsds.c
+onsetsds.h
+/Users/mikewinters/Desktop/ELVISon/server/plugins/onsetsds.h
+
+/Users/mikewinters/Desktop/ELVISon/server/plugins/onsetsds.h
+stdio.h
+-
+string.h
+-
+stdbool.h
+-
+math.h
+-
+

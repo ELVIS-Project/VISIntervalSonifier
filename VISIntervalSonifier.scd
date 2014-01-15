@@ -17,8 +17,8 @@ s.boot;
 ///////////////////////////////
 
 // GUI Object Variables
-var loadB, clearB, clearAllB, playB, recB, //dataB, mapB,//buttons
-knb1, knb2, knb3, //knobs
+var loadB, clearB, playB, recB, //dataB, mapB,//buttons
+knb1, knb2, knb3, //
 dataM, mapM, //pop-up menus
 loadV, dataV, //views
 horzChk, vertChk, diaChk, stackChk, stereoChk,//checkboxes
@@ -39,7 +39,7 @@ var recBuf=Buffer.alloc(s,0), recSynth, selectLen, selectTrue=false, recBufSamp;
 var errorD, errorT, errorS="";
 
 // Synth Controls:
-var transposition = 72, spread = 1, speed = 0.01, timePos=0,
+var transposition = 72, spread = 1, speed = 0.01, dur=0.25, timePos=0,
 task, pitchIntTask, intIntTask, horzVertTask, whichdata;
 
 // Handling Data
@@ -59,7 +59,7 @@ w = Window.new("elvisproject.ca",
 w.layout_(GridLayout.rows(
 	[[titleS=StaticText(), rows:2, columns:6],nil,nil,nil,nil,nil],
 	[nil,nil,nil,nil,nil,nil],
-	[[loadB=Button()],[clearB=Button()],[clearAllB=Button()],[subTitleS=StaticText(), rows:1, columns:3]],
+	[[loadB=Button()],[clearB=Button()],nil,[subTitleS=StaticText(), rows:1, columns:3]],
 	[[loadV=ListView(),columns:3,rows:3], nil, nil,
 		[mapM=PopUpMenu()], [dataM=PopUpMenu()], [recB=Button()]],
 //	[nil,nil,nil, [mapM=PopUpMenu()], [dataM=PopUpMenu()], [recB=Button()]],
@@ -122,10 +122,9 @@ horzStr.string_("Horz. Intervals");
 // Set items and states (menus and buttons)
 loadB.states_([["Load"]]);
 clearB.states_([["Clear"]]);
-clearAllB.states_([["Clear All"]]);
 playB.states_([["Play"],["Pause"]]);
 recB.states_([["Record"],["Stop"]]);
-mapM.items_(["Int. -> Pitch","Int. -> Int.","Vert. & Horz."]);
+mapM.items_(["Int. -> Pitch","Int. -> Int."]);
 dataM.items_(["Over Time","Histogram","Sorted"]);
 
 // What font to use in the data plot (dataV)?
@@ -176,6 +175,8 @@ loadV.selectionAction_({
 	dataM.valueAction=dataM.value;
 	mapM.valueAction=mapM.value;
 });
+// When you select new data, make sure you pause the player.
+loadV.mouseDownAction_({playB.valueAction_(0)});
 
 // What happens when you load data?
 loadDefault={
@@ -244,8 +245,12 @@ doHistogram={
 	dataDic.put(filenames.reverse[loadV.value]++"_histo".asSymbol,data);
 };
 
+//dataM.mouseDownAction_({playB.valueAction_(0);});
+//dataM.mouseUpAction_({loadV.selectionAction});
+//dataM.mouseUpAction_({playB.valueAction_(0);});
 // What happens when each of the data menu items are selected?
 dataM.action_({
+	task.reset;
 	if(dataM.item=="Over Time",{
 		if(dataDic.keys.includes(filenames.reverse[loadV.value].asSymbol),{
 			data = dataDic.at(filenames.reverse[loadV.value].asSymbol);
@@ -282,7 +287,8 @@ dataM.action_({
 	plotRefresh.value;
 });
 
-paths = PathName.new("/Users/mikewinters/Desktop/2Lup.app/Contents/Default_Data").files;
+//Platform.resourceDir.isString
+paths = PathName.new(Platform.resourceDir++"/Default_Data").files;
 filenames=paths.collect({|i| i.fileName});
 loadV.items_(filenames.reverse);
 mapM.action(0);
@@ -335,8 +341,9 @@ knb2.action_({var val=((knb2.value*48)+48).round;
 	knb2Str.string_("Pitch: "+val.asString+"\n(MIDI)");
 transposition=val;});
 knb3.action_({var val=(10.pow((knb3.value*4))).round;
-	knb3Str.string_("Speed: "+val.asString+"\n(Notes/Sec)");
+	knb3Str.string_("Speed: "+val.asString+"\n(Int./Sec)");
 	speed=1/val;
+	dur=1/(2*val.clip2(10));
 	dataV.mouseUpAction;}); //Must evaluate if
 
 // Check-box actions:
@@ -391,7 +398,7 @@ recB.action_({ arg recording;
 	if(recB.value==0,{ // If presently recording
 		fork{ //Write, free the buf, pause, set back to "record"
 			recSynth.free;
-			recBuf.write("~/Desktop/outtest.wav".standardizePath);
+			recBuf.write(Platform.userHomeDir++"/Desktop/outtest.wav".standardizePath);
 			recBuf.free;
 			{playB.valueAction_(0);  // pause the play
 			playB.enabled_(true);
@@ -451,6 +458,7 @@ diatonic=[descending,rising].flop;
 //diatonic[input-1]
 
 mapM.action_({
+	playB.valueAction_(0);
 	if(mapM.item=="Int. -> Pitch",{
 		sonData=data.flop;
 		task=pitchIntTask;
@@ -459,9 +467,6 @@ mapM.action_({
 		sonData=data.abs.flop;
 		knb1.valueAction=0.5;
 		task=intIntTask;
-	});
-	if(mapM.item=="Vert. & Horz.",{
-		mapM.item.postln;
 	});
 });
 
@@ -472,12 +477,13 @@ mapM.action_({
 
 // What is the fundamental synth?
 SynthDef(\newSynth, {
-	arg midi=0, spread=1, speed=0.1, transposition=72, iteration=0;
+	arg midi=0, spread=1, speed=0.1, transposition=72, iteration=0, dur=0.25;
 	var sound, env, synth, pitch, phase;
 	pitch = ((midi*spread)+transposition).midicps;
+	//sound=SinOsc.ar(pitch,mul:0.1)*AmpComp.kr(pitch,40.midicps);
 	phase = (pitch*speed*iteration).wrap(0,1)*2*pi; // "Always in Phase"
-	sound=SinOsc.ar(pitch,phase,0.01)*AmpComp.kr(pitch,40.midicps);
-	env=EnvGen.kr(Env.sine(dur:0.2), doneAction:2);
+	sound=SinOsc.ar(pitch,phase,0.05)*AmpComp.kr(pitch,40.midicps);
+	env=EnvGen.kr(Env.sine(dur: dur), doneAction:2);
 	synth=sound*env;
 	OffsetOut.ar([0,1],synth);
 }).send(s);
@@ -487,6 +493,7 @@ pitchIntTask=Task({
 	selectLen.do({arg i;
 		s.sendMsg("/s_new","newSynth",-1,0,0,
 			\midi,(sonData[timePos][whichdata]),
+			\dur, dur,
 			\speed, speed,
 			\spread, spread,
 			\transposition, transposition,

@@ -1,0 +1,1 @@
+/usr/bin/c++    -O2 -g -DNDEBUG -arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk -bundle -Wl,-headerpad_max_install_names   -o UIUGens.scx CMakeFiles/UIUGens.dir/UIUGens.cpp.o /usr/lib/libpthread.dylib -framework CoreServices -framework Carbon 

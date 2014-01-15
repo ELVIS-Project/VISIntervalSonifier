@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/mikewinters/Desktop/ELVISon/external_libraries/TLSF-2.4.6/src/target.h
+pthread.h
+-
+
+/Users/mikewinters/Desktop/ELVISon/external_libraries/TLSF-2.4.6/src/tlsf.c
+string.h
+-
+target.h
+/Users/mikewinters/Desktop/ELVISon/external_libraries/TLSF-2.4.6/src/target.h
+unistd.h
+-
+sys/mman.h
+-
+tlsf.h
+/Users/mikewinters/Desktop/ELVISon/external_libraries/TLSF-2.4.6/src/tlsf.h
+stdio.h
+-
+
+/Users/mikewinters/Desktop/ELVISon/external_libraries/TLSF-2.4.6/src/tlsf.h
+sys/types.h
+-
+
